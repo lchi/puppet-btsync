@@ -1,17 +1,41 @@
 {
-  "device_name": "<%= @device_name %>",
-  "listening_port" : <%= @listening_port %>,
-  "storage_path" : "<%= @storage_conf_path %>",
-  "pid_file" : "/var/run/btsync.pid",
-  "check_for_updates" : false,
-  "use_upnp" : <%= @use_upnp %>,
-  "download_limit" : <%= @download_limit %>,
-  "upload_limit" : <%= @upload_limit %>,
-  "use_gui" : false,
+  "device_name": "<%= @settings['device_name'] or @hostname -%>",
+  "storage_path" : "<%= @settings['storage_conf_path'] or "/opt/btsync/.sync" -%>",
+  "pid_file" : "<%= @settings['pid_file'] or "/var/run/btsync.pid" -%>",
+  "check_for_updates" : <%= @settings['check_for_updates'] or false -%>,
+  "use_upnp" : <%= @settings['use_upnp'] or true -%>,
+  "use_gui": <%= @settings['use_gui'] or false -%>,
+  "disk_low_priority": <%= @settings['disk_low_priority'] or true -%>,
+
+  // 0 - randomize port
+  "listening_port" : <%= @settings['listening_port'] or 0 -%>,
+
+  // 0 - no limit
+  "download_limit" : <%= @settings['download_limit'] or 0 -%>,
+  "upload_limit" : <%= @settings['upload_limit'] or 0 -%>,
+
+  // Removing the listen field disables the web ui
+  // Removing the "login" and "password" fields disables credentials check
   "webui" : {
-    "listen" : "<%= @webui_ip %>:<%= @webui_port %>",
-    "login" : "<%= @webui_login %>",
-    "password" : "<%= @webui_pwd %>",
-    "api_key" : "<%= @api_key %>"
-  }
+  <% if @settings['webui_listen'] -%>"listen" : "<%= @settings['webui_listen'] -%>"<% end -%><% if @settings['webui_login'] -%>,
+    "login" : "<%= @settings['webui_login'] -%>"<% end -%><% if @settings['webui_password'] -%>,
+    "password" : "<%= @settings['webui_password'] -%>",<% end -%><% if @settings['api_key'] -%>,
+    "api_key" : "<%= @settings['api_key'] -%>" <% end %>
+  },
+
+  "shared_folders": [
+    <% @shared_folders.each_with_index do |folder,i| -%>
+
+      <% if i > 0 -%>,<% end -%>{
+        "secret": "<%= folder['secret'] -%>",
+        "dir": "<%= folder['dir'] -%>",
+        "use_relay_server": <%= folder['use_relay_server'] or true -%>,
+        "use_tracker": <%= folder['use_tracker'] or true -%>,
+        "use_dht": <%= folder['use_dht'] or false -%>,
+        "search_lan": <%= folder['search_lan'] or true -%>,
+        "use_sync_trash": <%= folder['use_sync_trash'] or true %>
+      }
+    <% end %>
+  ]
+
 }

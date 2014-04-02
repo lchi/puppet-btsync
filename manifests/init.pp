@@ -53,26 +53,20 @@
 # Copyright 2014 Gamaliel Sick, unless otherwise noted.
 #
 class btsync(
-  $glibc23                = hiera('btsync::glibc23', true),
-  $install_dir            = hiera('btsync::install_dir', '/opt/btsync'),
-  $storage_conf_path      = hiera('btsync::storage_conf_path', '/opt/btsync/.sync'),
-  $webui_ip               = hiera('btsync::webui_ip', '127.0.0.1'),
-  $webui_port             = hiera('btsync::webui_port', '8888'),
-  $webui_login            = hiera('btsync::webui_login'),
-  $webui_pwd              = hiera('btsync::webui_pwd'),
-  $api_key                = hiera('btsync::api_key'),
-  $tmp                    = hiera('btsync::tmp', '/tmp'),
-  $listening_port         = hiera('btsync::listening_port', 0),
-  $use_upnp               = hiera('btsync::use_upnp', true),
-  $download_limit         = hiera('btsync::download_limit', 0),
-  $upload_limit           = hiera('btsync::upload_limit', 0),
-  $device_name            = hiera('btsync::device_name', 'My Sync Device'),
+  $glibc23                = true,
+  $install_dir            = '/opt/btsync',
+  $storage_conf_path      = '/opt/btsync/.sync',
+  $tmp                    = '/tmp',
+  $settings               = {},
+  $shared_folders         = [],
+  $known_hosts            = [],
 ) {
 
   singleton_packages('wget')
 
   case $::architecture {
     'x86_64':        {  $arch = 'x64'}
+    'amd64':         {  $arch = 'x64'}
     'i386':          {  $arch = 'i386'}
     default:         {  fail("Architecture not compatible: ${::architecture}")}
   }
