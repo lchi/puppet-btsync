@@ -6,6 +6,7 @@
   "use_upnp" : <%= @settings['use_upnp'] or true -%>,
   "use_gui": <%= @settings['use_gui'] or false -%>,
   "disk_low_priority": <%= @settings['disk_low_priority'] or true -%>,
+  "lan_encrypt_data": <%= @settings['lan_encrypt_data'] or true -%>,
 
   // 0 - randomize port
   "listening_port" : <%= @settings['listening_port'] or 0 -%>,
@@ -24,17 +25,24 @@
   },
 
   "shared_folders": [
-    <% @shared_folders.each_with_index do |folder,i| -%>
+    <% counter = 0 %>
+    <% @shared_folders.each do |folder, options| -%>
 
-      <% if i > 0 -%>,<% end -%>{
-        "secret": "<%= folder['secret'] -%>",
-        "dir": "<%= folder['dir'] -%>",
-        "use_relay_server": <%= folder['use_relay_server'] or true -%>,
-        "use_tracker": <%= folder['use_tracker'] or true -%>,
-        "use_dht": <%= folder['use_dht'] or false -%>,
-        "search_lan": <%= folder['search_lan'] or true -%>,
-        "use_sync_trash": <%= folder['use_sync_trash'] or true %>
+      <% if counter > 0 -%>,<% end -%>{
+        "secret": "<%= options['secret'] -%>",
+        "dir": "<%= folder -%>",
+        "use_relay_server": <%= options['use_relay_server'] or true -%>,
+        "use_tracker": <%= options['use_tracker'] or true -%>,
+        "use_dht": <%= options['use_dht'] or false -%>,
+        "search_lan": <%= options['search_lan'] or true -%>,
+        "use_sync_trash": <%= options['use_sync_trash'] or true %>,
+        "known_hosts": [
+        <% if options['known_hosts'] %>
+          "<%= options['known_hosts'].join("\",\n          \"") -%>"
+        <% end %>
+        ]
       }
+      <% counter += 1 %>
     <% end %>
   ]
 

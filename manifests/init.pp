@@ -71,7 +71,6 @@ class btsync(
     command => "wget -O ${file_name} ${download_url}",
     creates => "${tmp}/${file_name}",
     notify  => Exec['untar btsync'],
-    require => Package['wget'],
   }
 
   exec { 'untar btsync':
@@ -82,7 +81,8 @@ class btsync(
     require => File[$install_dir],
   }
 
-  file { "${install_dir}/btsync.json":
+  $config_file = "${install_dir}/btsync.json"
+  file { $config_file:
     ensure  => file,
     require => File[$install_dir],
     content => template("${module_name}/btsync.json.erb"),
@@ -99,6 +99,7 @@ class btsync(
     ensure     => $service_ensure,
     hasrestart => true,
     hasstatus  => true,
-    require    => File["/etc/init.d/btsync", "${install_dir}/btsync.json"],
+    require    => File["/etc/init.d/btsync"],
+    subscribe  => File[$config_file],
   }
 }
