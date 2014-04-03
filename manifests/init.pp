@@ -42,8 +42,6 @@ class btsync(
   $service_ensure    = running,
 ) {
 
-  singleton_packages('wget')
-
   case $::architecture {
     'x86_64':        {  $arch = 'x64'}
     'amd64':         {  $arch = 'x64'}

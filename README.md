@@ -127,6 +127,7 @@ Gamaliel Sick
 
 ## Contributing
 
+  * Open an issue in Github
   * Fork it
   * Create your feature branch (git checkout -b my-new-feature)
   * Commit your changes (git commit -am 'Add some feature')
