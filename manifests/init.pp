@@ -10,28 +10,6 @@
 #
 # $storage_conf_path::  BTSync conf path.
 #
-# $webui_ip::  The IP for web UI.
-#
-# $webui_port::  The port for web UI.
-#
-# $webui_login::  The login for web UI.
-#
-# $webui_pwd::  The password for web UI.
-#
-# $api_key::  The api key.
-#
-# $tmp::  Temp directory.
-#
-# $listening_port::  Temp directory.
-#
-# $use_upnp::  Temp directory.
-#
-# $download_limit::  Temp directory.
-#
-# $upload_limit::  Temp directory.
-#
-# $device_name:: Name of the device
-#
 # == Requires:
 #
 # Nothing
@@ -53,13 +31,15 @@
 # Copyright 2014 Gamaliel Sick, unless otherwise noted.
 #
 class btsync(
-  $glibc23                = true,
-  $install_dir            = '/opt/btsync',
-  $storage_conf_path      = '/opt/btsync/.sync',
-  $tmp                    = '/tmp',
-  $settings               = {},
-  $shared_folders         = [],
-  $known_hosts            = [],
+  $glibc23           = true,
+  $install_dir       = '/opt/btsync',
+  $storage_conf_path = '/opt/btsync/.sync',
+  $log_directory     = '/var/log/btsync',
+  $tmp               = '/tmp',
+  $settings          = {},
+  $shared_folders    = [],
+  $known_hosts       = [],
+  $service_ensure    = running,
 ) {
 
   singleton_packages('wget')
@@ -78,14 +58,13 @@ class btsync(
                   $file_name = "btsync_${arch}.tar.gz"}
   }
 
-  file { 'btsync install dir':
+  file { [$install_dir, $storage_conf_path]:
     ensure => directory,
-    path   => $install_dir,
   }
 
-  file { 'btsync conf dir':
+  file { $log_directory:
     ensure => directory,
-    path   => $storage_conf_path,
+    mode   => 0755,
   }
 
   exec { 'download btsync':
@@ -98,23 +77,30 @@ class btsync(
   }
 
   exec { 'untar btsync':
-    require => File['btsync install dir'],
     cwd     => $tmp,
     path    => '/bin:/usr/bin',
     command => "tar -zxvf ${file_name} -C ${install_dir}",
     creates => "${install_dir}/btsync",
+    require => File[$install_dir],
   }
 
-  file { 'btsync conf file':
+  file { "${install_dir}/btsync.json":
     ensure  => file,
-    path    => "${install_dir}/btsync.json",
-    require => File['btsync install dir'],
+    require => File[$install_dir],
     content => template("${module_name}/btsync.json.erb"),
   }
 
-  exec { 'btsync':
-    require => [Exec['untar btsync'], File['btsync conf file', 'btsync conf dir']],
-    cwd     => $install_dir,
-    command => "${install_dir}/btsync --config btsync.json",
+  file { "/etc/init.d/btsync":
+    ensure  => file,
+    mode    => 0755,
+    content => template("${module_name}/btsync.init.d.erb"),
+    require => Exec['untar btsync']
+  }
+
+  service { 'btsync':
+    ensure     => $service_ensure,
+    hasrestart => true,
+    hasstatus  => true,
+    require    => File["/etc/init.d/btsync", "${install_dir}/btsync.json"],
   }
 }
