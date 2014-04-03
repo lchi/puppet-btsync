@@ -1,4 +1,7 @@
+// Hack for or statements
+<% @settings.each { |k,v| @settings[k] = v.to_s } -%>
 {
+
   "device_name": "<%= @settings['device_name'] or @hostname -%>",
   "storage_path" : "<%= @settings['storage_conf_path'] or "/opt/btsync/.sync" -%>",
   "pid_file" : "<%= @settings['pid_file'] or "/var/run/btsync.pid" -%>",
@@ -27,6 +30,9 @@
   "shared_folders": [
     <% counter = 0 -%>
     <% @shared_folders.each do |folder, options| -%>
+
+      // Hack for or statements
+      <% options.each { |k,v| options[k] = v.to_s } -%>
 
       <% if counter > 0 -%>,<% end -%>{
         "secret": "<%= options['secret'] -%>",
