@@ -16,7 +16,7 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 NAME=btsync
 DAEMON=<%= @install_dir -%>/btsync
 CONFIGFILE=<%= @install_dir -%>/btsync.json
-DAEMON_ARGS="--config <%= @install_dir -%>/btsync.json --log <% @log_directory -%>/btsync.log"
+DAEMON_ARGS="--config <%= @install_dir -%>/btsync.json --log <%= @log_directory -%>/btsync.log"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
