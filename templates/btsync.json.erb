@@ -10,6 +10,7 @@
   "use_gui": <%= @settings['use_gui'] or false -%>,
   "disk_low_priority": <%= @settings['disk_low_priority'] or true -%>,
   "lan_encrypt_data": <%= @settings['lan_encrypt_data'] or true -%>,
+  "folder_rescan_interval": <%= @settings['folder_rescan_interval'] or 10 -%>,
 
   // 0 - randomize port
   "listening_port" : <%= @settings['listening_port'] or 0 -%>,
